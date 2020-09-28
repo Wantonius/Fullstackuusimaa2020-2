@@ -5,8 +5,13 @@ let app = express();
 
 app.use(bodyParser.json());
 
-app.get("/",function(req,res) {
-	return res.status(200).json({"message":"Hello world!"})
+app.use(express.static("public"));
+
+app.get("/hello/:name",function(req,res) {
+	console.log(req);
+	let name = req.params.name;
+	let hello = "Hello "+name;
+	return res.status(200).json({"message":hello})
 });
 
 app.listen(3000);
