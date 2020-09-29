@@ -90,7 +90,7 @@ populateTable = () => {
 	let anchor = document.getElementById("anchor");
 	let table = document.getElementById("table");
 	if(table) {
-		anchor.removeChild("table");
+		anchor.removeChild(table);
 	}
 	let newTable = document.createElement("table");
 	newTable.setAttribute("id","table");
