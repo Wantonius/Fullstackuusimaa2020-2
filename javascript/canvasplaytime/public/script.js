@@ -25,6 +25,10 @@ createRect = () => {
 	ctx.fillRect(x,y,side,side);
 }
 
+clearCanvas = () => {
+	ctx.clearRect(0,0,500,500);
+}
+
 startCanvas = () => {
 	if(running) {
 		running = 0;
