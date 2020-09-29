@@ -8,7 +8,7 @@ app.use(express.static("public"));
 app.use(bodyParser.json());
 
 //Database
-const database = [];
+let database = [];
 let id = 100;
 
 //REST API
@@ -31,6 +31,12 @@ app.post("/api/shopping", function(req,res) {
 	id++;
 	database.push(item);
 	console.log(database);
+	return res.status(200).json({message:"success"});
+})
+
+app.delete("/api/shopping/:id",function(req,res) {
+	let tempId = parseInt(req.params.id,10);
+	database = database.filter((item) => item.id !== tempId);
 	return res.status(200).json({message:"success"});
 })
 

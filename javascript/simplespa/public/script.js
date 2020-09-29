@@ -1,11 +1,30 @@
-var database = [];
-var id=100;
-
 window.onload = function() {
 	createForm();
+	getList();
 }
 
-createForm = () => {
+const getList = () => {
+	let request = {
+		method:"GET",
+		mode:"cors",
+		headers:{"Content-type":"application/json"}
+	}
+	fetch("/api/shopping",request).then((response) => {
+		if(response.ok) {
+			response.json().then((data) => {
+				populateTable(data);
+			}).catch((error) => {
+				console.log(error);
+			});
+		} else {
+			console.log("Server responded with status:"+response.statusText);
+		}
+	}).catch((error) => {
+		console.log(error);
+	});
+}
+
+const createForm = () => {
 	let anchor = document.getElementById("anchor");
 	let form = document.createElement("form");
 	
@@ -72,30 +91,51 @@ createForm = () => {
 	anchor.appendChild(form);
 }
 
-addToList = () => {
+const addToList = () => {
 	console.log("AddToList()");
 	let typeinput = document.getElementById("type");
 	let countinput = document.getElementById("count");
 	let priceinput = document.getElementById("price");
 	let item = {
-		id:id,
 		type:typeinput.value,
 		count:countinput.value,
 		price:priceinput.value
 	}
-	id++;
-	database.push(item);
-	console.log(database);
-	populateTable();
+	let request = {
+		method:"POST",
+		mode:"cors",
+		headers:{"Content-type":"application/json"},
+		body:JSON.stringify(item)
+	}
+	fetch("/api/shopping",request).then((response) =>{
+		if(response.ok) {
+			getList();
+		} else {
+			console.log("Server responded with status:"+response.statusText)
+		}
+	}).catch((error) => {
+		console.log(error);
+	});
 }
 
-removeFromList = (id) => {
-	let tempId = parseInt(id,10);
-	database = database.filter((item) => item.id !== tempId);
-	populateTable();
+const removeFromList = (id) => {
+	let request = {
+		method:"DELETE",
+		mode:"cors",
+		headers:{"Content-type":"application/json"}
+	}
+	fetch("/api/shopping/"+id,request).then((response) =>{
+		if(response.ok) {
+			getList();
+		} else {
+			console.log("Server responded with status:"+response.statusText)
+		}
+	}).catch((error) => {
+		console.log(error);
+	});	
 }
 
-populateTable = () => {
+const populateTable = (data) => {
 	let anchor = document.getElementById("anchor");
 	let table = document.getElementById("table");
 	if(table) {
@@ -138,14 +178,14 @@ populateTable = () => {
 	
 	//Table body
 	let body = document.createElement("tbody");
-	for(let i=0;i<database.length;i++) {
+	for(let i=0;i<data.length;i++) {
 		let tableRow = document.createElement("tr");
-		for (x in database[i]) {
+		for (x in data[i]) {
 			if(x === "id") {
 				continue;
 			}
 			let column = document.createElement("td");
-			let node = document.createTextNode(database[i][x]);
+			let node = document.createTextNode(data[i][x]);
 			column.appendChild(node);
 			tableRow.appendChild(column);
 		}
@@ -153,7 +193,7 @@ populateTable = () => {
 		let removeButton = document.createElement("button");
 		let removeText = document.createTextNode("Buy");
 		removeButton.appendChild(removeText);
-		removeButton.setAttribute("name",database[i].id);
+		removeButton.setAttribute("name",data[i].id);
 		removeButton.addEventListener("click",function(e) {
 			removeFromList(e.target.name);
 		})
