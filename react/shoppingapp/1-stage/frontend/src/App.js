@@ -25,12 +25,19 @@ class App extends React.Component {
 		})
 	}
 	
+	removeFromList = (id) => {
+		let tempList = this.state.list.filter(item => item.id !== id);
+		this.setState({
+			list:tempList
+		})
+	}
+	
 	render() {
 		return (
 			<div className="App">
 				<ShoppingForm addToList={this.addToList}/>
 				<hr/>
-				<ShoppingList list={this.state.list}/>
+				<ShoppingList list={this.state.list} removeFromList={this.removeFromList}/>
 			</div>
 	    );
 	}
