@@ -32,12 +32,20 @@ class App extends React.Component {
 		})
 	}
 	
+	editItem = (newItem) => {
+		let tempList = this.state.list.map(item => item.id === newItem.id ? newItem : item)
+		this.setState({
+			list:tempList
+		});
+	}
+	
 	render() {
 		return (
 			<div className="App">
 				<ShoppingForm addToList={this.addToList}/>
 				<hr/>
-				<ShoppingList list={this.state.list} removeFromList={this.removeFromList}/>
+				<ShoppingList list={this.state.list} removeFromList={this.removeFromList}
+					editItem={this.editItem}/>
 			</div>
 	    );
 	}
