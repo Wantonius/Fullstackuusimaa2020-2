@@ -6,7 +6,8 @@ let database = [];
 let id = 500;
 
 router.get("/shopping",function(req,res) {
-	return res.status(200).json(database);
+	let tempDatabase = database.filter(item => item.user === req.session.user)
+	return res.status(200).json(tempDatabase);
 })
 
 router.post("/shopping",function(req,res) {
@@ -14,7 +15,8 @@ router.post("/shopping",function(req,res) {
 		id:id,
 		type:req.body.type,
 		count:req.body.count,
-		price:req.body.price
+		price:req.body.price,
+		user:req.session.user
 	}
 	id++;
 	database.push(item);
@@ -23,9 +25,17 @@ router.post("/shopping",function(req,res) {
 
 router.delete("/shopping/:id",function(req,res) {
 	let tempId = parseInt(req.params.id,10);
-	let tempList = database.filter(item => item.id !== tempId);
-	database = tempList;
-	return res.status(200).json({message:"succees"})
+	for(let i=0;i<database.length;i++) {
+		if(database[i].id === tempId) {
+			if(database[i].user === req.session.user) {
+				database.splice(i,1);
+				return res.status(200).json({message:"succees"})
+			} else {
+				return res.status(409).json({message:"conflict"})
+			}
+		}
+	}
+	return res.status(404).json({message:"not found"})
 })
 
 router.put("/shopping/:id",function(req,res) {
@@ -34,11 +44,20 @@ router.put("/shopping/:id",function(req,res) {
 		id:tempId,
 		type:req.body.type,
 		count:req.body.count,
-		price:req.body.price
+		price:req.body.price,
+		user:req.session.user
 	}
-	let tempList = database.map(item => item.id !== newItem.id ? item : newItem)
-	database = tempList;
-	return res.status(200).json({message:"success"})
+	for(let i=0;i<database.length;i++) {
+		if(database[i].id === tempId) {
+			if(database[i].user === req.session.user) {
+				database.splice(i,1,newItem);
+				return res.status(200).json({message:"succees"})
+			} else {
+				return res.status(409).json({message:"conflict"})
+			}
+		}
+	}
+	return res.status(404).json({message:"not found"})
 })
 
 module.exports = router;
