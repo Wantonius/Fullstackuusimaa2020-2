@@ -17,11 +17,17 @@ class App extends React.Component {
 			token:""
 		}
 	}
-	/*
+	
 	componentDidMount() {
-		this.getList();
+		if(sessionStorage.getItem("state")){
+			let state = JSON.parse(sessionStorage.getItem("state"));
+			this.setState(state,() => {this.getList()})
+		}
 	}
-	*/
+
+	saveToStorage = () => {
+		sessionStorage.setItem("state",JSON.stringify(this.state));
+	}
 
 	//LOGIN API
 	register = (user) => {
@@ -60,6 +66,7 @@ class App extends React.Component {
 						isLogged:true,
 						token:data.token
 					}, () => {
+						this.saveToStorage();
 						this.getList();
 					})
 				}).catch(error => {
@@ -86,6 +93,8 @@ class App extends React.Component {
 				response.json().then(data => {
 					this.setState({
 						list:data
+					}, () => {
+						this.saveToStorage();
 					})
 				}).catch(error => {
 					console.log("Error parsing JSON:",error);
@@ -160,7 +169,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">
-				<Navbar/>
+				<Navbar isLogged={this.state.isLogged}/>
 				<hr/>
 				<Switch>
 					<Route exact path="/" render={
