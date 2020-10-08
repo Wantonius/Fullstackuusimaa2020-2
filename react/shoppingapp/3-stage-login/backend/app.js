@@ -6,10 +6,6 @@ let app = express();
 
 app.use(bodyParser.json());
 
-app.use(function(req,res,next) {
-	console.log("Hi! I am a filter");
-	return next();
-})
 
 //login databases
 
@@ -18,6 +14,27 @@ let loggedSessions = [];
 let ttl = 3600000;
 
 //middleware
+
+isUserLogged = (req,res,next) => {
+	let token = req.headers.token;
+	if(!token) {
+		return res.status(403).json({message:"forbidden"})
+	}
+	for(let i=0;i<loggedSessions.length;i++) {
+		if(token === loggedSessions[i].token) {
+			let now = Date.now();
+			if(now > loggedSessions[i].ttl) {
+				loggedSessions.splice(i,1);
+				return res.status(403).json({message:"forbidden"})
+			}
+			req.session = {};
+			req.session.user = loggedSessions[i].user;
+			loggedSessions[i].ttl = loggedSessions[i].ttl+ttl;
+			return next();
+		}
+	}
+	return res.status(403).json({message:"forbidden"})
+}
 
 createToken = () => {
 	const letters = "abcdefghijABCDEFGHIJ0123456789";
@@ -83,7 +100,7 @@ app.post("/login",function(req,res) {
 	return res.status(403).json({message:"forbidden"})
 })
 
-app.use("/api",apiroutes);
+app.use("/api",isUserLogged,apiroutes);
 
 
 let port = process.env.PORT || 3001
