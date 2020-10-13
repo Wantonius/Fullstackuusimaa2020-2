@@ -4,11 +4,12 @@ const apiroutes = require("./routes/apiroutes");
 const mongoose = require("mongoose")
 const userModel = require("./models/user");
 const sessionModel = require("./models/session");
+const config = require("./config/config")
 
 let app = express();
 //mongoose.connect("mongodb://localhost/databasename").then(
 //mongodb://localhost/databasename
-mongoose.connect("mongodb+srv://test:test@mycluster.ujjvo.mongodb.net/shoppingdatabase?retryWrites=true&w=majority").then(
+mongoose.connect("mongodb+srv://"+config.user+":"+config.password+"@mycluster.ujjvo.mongodb.net/"+config.database+"?retryWrites=true&w=majority").then(
 	() => console.log("Success in connecting to mongodb"),
 	(error) => console.log("Failed to connect to mongodb. Error:",error)
 )
