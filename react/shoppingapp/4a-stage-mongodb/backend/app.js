@@ -2,11 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const apiroutes = require("./routes/apiroutes");
 const mongoose = require("mongoose")
+const userModel = require("./models/user");
+const sessionModel = require("./models/session");
 
 let app = express();
-mongoose.connect("mongodb://localhost/databasename").then(
+//mongoose.connect("mongodb://localhost/databasename").then(
 //mongodb://localhost/databasename
-//mongoose.connect("mongodb+srv://<username>:<password>@mycluster.ujjvo.mongodb.net/shoppingdatabase?retryWrites=true&w=majority").then(
+mongoose.connect("mongodb+srv://test:test@mycluster.ujjvo.mongodb.net/shoppingdatabase?retryWrites=true&w=majority").then(
 	() => console.log("Success in connecting to mongodb"),
 	(error) => console.log("Failed to connect to mongodb. Error:",error)
 )
@@ -16,8 +18,7 @@ app.use(bodyParser.json());
 
 //login databases
 
-let registeredUsers = [];
-let loggedSessions = [];
+
 let ttl = 3600000;
 
 //middleware
@@ -65,17 +66,17 @@ app.post("/register",function(req,res) {
 	if(req.body.username.length < 4 || req.body.password.length < 8) {
 		return res.status(422).json({message:"Username must be atleast 4 and password 8 characters long"})
 	}
-	for(let i=0;i<registeredUsers.length;i++) {
-		if(req.body.username === registeredUsers[i].username) {
-			return res.status(409).json({message:"Username is already in use"})
-		}
-	}
-	let user = {
+	let user = new userModel({
 		username:req.body.username,
 		password:req.body.password
-	}
-	registeredUsers.push(user);
-	return res.status(200).json({message:"success"})
+	})
+	user.save(function(err,user) {
+		if(err) {
+			console.log("Register failed, reason:"+err);
+			return res.status(409).json({message:"Username is already in use"})
+		}
+		return res.status(200).json({message:"success"})
+	})
 })
 
 app.post("/login",function(req,res) {
@@ -88,23 +89,28 @@ app.post("/login",function(req,res) {
 	if(req.body.username.length < 4 || req.body.password.length < 8) {
 		return res.status(422).json({message:"Username must be atleast 4 and password 8 characters long"})
 	}
-	for(let i=0;i<registeredUsers.length;i++) {
-		if(req.body.username === registeredUsers[i].username) {
-			if(req.body.password === registeredUsers[i].password) {
-				let token = createToken();
-				let tempttl = Date.now();
-				let session = {
-					user:req.body.username,
-					ttl:tempttl+ttl,
-					token:token
-				}
-				loggedSessions.push(session);
-				return res.status(200).json({token:token})
-				
-			}
+	userModel.findOne({"username":req.body.username}, function(err,user) {
+		if(err) {
+			return res.status(422).json({message:"Please enter proper credentials"})
 		}
-	}
-	return res.status(403).json({message:"forbidden"})
+		if(!user) {
+			return res.status(422).json({message:"Please enter proper credentials"})
+		}
+		let token = createToken();
+		let now = Date.now();
+		let session = new sessionModel({
+			user:req.body.username,
+			ttl:now+ttl,
+			token:token
+		})
+		session.save(function(err) {
+			if(err) {
+				console.log("Session creation failed:",err)
+				return res.status(422).json({message:"Please enter proper credentials"})
+			}
+			return res.status(200).json({token:token})
+		})
+	})
 })
 
 app.use("/api",isUserLogged,apiroutes);
