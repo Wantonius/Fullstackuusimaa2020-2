@@ -11,7 +11,7 @@ export default class RemoveRow extends React.Component {
 				<Table.Cell>{this.props.item.price}</Table.Cell>
 				<Table.Cell><Button color="red" onClick={() => this.props.cancel()}
 					>Cancel</Button></Table.Cell>
-				<Table.Cell><Button color="green" onClick={() => this.props.removeFromList(this.props.item.id)}
+				<Table.Cell><Button color="green" onClick={() => this.props.removeFromList(this.props.item._id)}
 					>Confirm</Button></Table.Cell>
 			</Table.Row>	
 		

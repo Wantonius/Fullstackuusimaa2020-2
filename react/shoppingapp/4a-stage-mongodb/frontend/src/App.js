@@ -193,7 +193,7 @@ class App extends React.Component {
 					 "token":this.state.token},
 			body:JSON.stringify(newItem)
 		}
-		fetch("/api/shopping/"+newItem.id,request).then(response => {
+		fetch("/api/shopping/"+newItem._id,request).then(response => {
 			if(response.ok) {
 				this.getList();
 			}

@@ -33,7 +33,7 @@ export default class ShoppingList extends React.Component {
 	
 	changeToRemoveMode = (id) => {
 		for(let i=0;i<this.props.list.length;i++) {
-			if(id === this.props.list[i].id) {
+			if(id === this.props.list[i]._id) {
 				this.setState({
 					removeIndex:i,
 					editIndex:-1
@@ -44,7 +44,7 @@ export default class ShoppingList extends React.Component {
 
 	changeToEditMode = (id) => {
 		for(let i=0;i<this.props.list.length;i++) {
-			if(id === this.props.list[i].id) {
+			if(id === this.props.list[i]._id) {
 				this.setState({
 					removeIndex:-1,
 					editIndex:i
@@ -58,18 +58,18 @@ export default class ShoppingList extends React.Component {
 		let items = this.props.list.map((item,index) => {
 			if(this.state.editIndex === index) {
 				return(
-					<EditRow key={item.id} item={item}
+					<EditRow key={item._id} item={item}
 							cancel={this.cancel} editItem={this.editItem}/>
 				)
 			}
 			if(this.state.removeIndex === index) {
 				return (
-				<RemoveRow key={item.id} item={item} 
+				<RemoveRow key={item._id} item={item} 
 				cancel={this.cancel} removeFromList={this.removeFromList}/>
 				)
 			}
 			return (
-				<Row key={item.id} item={item} changeToRemoveMode={this.changeToRemoveMode}
+				<Row key={item._id} item={item} changeToRemoveMode={this.changeToRemoveMode}
 					changeToEditMode={this.changeToEditMode}/>
 				)
  		})
