@@ -44,20 +44,38 @@ isUserLogged = (req,res,next) => {
 	if(!token) {
 		return res.status(403).json({message:"forbidden"})
 	}
-	for(let i=0;i<loggedSessions.length;i++) {
-		if(token === loggedSessions[i].token) {
-			let now = Date.now();
-			if(now > loggedSessions[i].ttl) {
-				loggedSessions.splice(i,1);
-				return res.status(403).json({message:"forbidden"})
-			}
-			req.session = {};
-			req.session.user = loggedSessions[i].user;
-			loggedSessions[i].ttl = loggedSessions[i].ttl+ttl;
-			return next();
+	let sql = "SELECT * FROM sessions WHERE token='"+token+"'";
+	con.query(sql,function(err,sessions) {
+		if(err) {
+			res.status(500).json({message:"database failure"})
+			throw err;
 		}
-	}
-	return res.status(403).json({message:"forbidden"})
+		if(sessions.length === 0) {
+			return res.status(403).json({message:"forbidden"})
+		}
+		let now = Date.now();
+		let session = sessions[0];
+		if(now > session.ttl) {
+			sql = "DELETE FROM sessions WHERE token='"+token+"'";
+			con.query(sql, function(err) {
+				if(err) {
+					console.log(err);
+				}
+				return res.status(403).json({message:"forbidden"})
+			})
+		} else {
+			req.session = {};
+			req.session.user = session.user;
+			let tempttl = now+ttl;
+			sql = "UPDATE sessions SET ttl="+tempttl+" WHERE token='"+token+"'";
+			con.query(sql,function(err) {
+				if(err) {
+					console.log(err);
+				}
+				return next();
+			})
+		}
+	})
 }
 
 createToken = () => {

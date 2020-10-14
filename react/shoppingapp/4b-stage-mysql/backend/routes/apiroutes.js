@@ -1,63 +1,66 @@
 const express = require("express");
+const mysql = require("mysql");
 
 let router = express.Router();
 
-let database = [];
-let id = 500;
+let con = mysql.createConnection({
+	host:"localhost",
+	user:"test",
+	password:"test",
+	database:"shoppingdatabase"
+})
 
 router.get("/shopping",function(req,res) {
-	let tempDatabase = database.filter(item => item.user === req.session.user)
-	return res.status(200).json(tempDatabase);
+	let sql = "SELECT * FROM shoppingitems WHERE user='"+req.session.user+"'";
+	con.query(sql,function(err,items) {
+		if(err) {
+			res.status(500).json({message:"database failure"})
+			throw err;
+		}
+		return res.status(200).json(items);
+	})
 })
 
 router.post("/shopping",function(req,res) {
-	let item = {
-		id:id,
-		type:req.body.type,
-		count:req.body.count,
-		price:req.body.price,
-		user:req.session.user
-	}
-	id++;
-	database.push(item);
-	return res.status(200).json({message:"success"});
+	let sql = "INSERT INTO shoppingitems (type,count,price,user) VALUES ('"+req.body.type+"',"+req.body.count+","+req.body.price+",'"+req.session.user+"')"
+	con.query(sql,function(err) {
+		if(err) {
+			res.status(500).json({message:"database failure"})
+			throw err;
+		}
+		return res.status(200).json({message:"success"})
+	})
+	
 })
 
 router.delete("/shopping/:id",function(req,res) {
 	let tempId = parseInt(req.params.id,10);
-	for(let i=0;i<database.length;i++) {
-		if(database[i].id === tempId) {
-			if(database[i].user === req.session.user) {
-				database.splice(i,1);
-				return res.status(200).json({message:"succees"})
-			} else {
-				return res.status(409).json({message:"conflict"})
-			}
+	let sql = "DELETE FROM shoppingitems WHERE _id="+tempId+" AND user='"+req.session.user+"'";
+	con.query(sql,  function(err,result) {
+		if(err) {
+			res.status(500).json({message:"database failure"})
+			throw err;			
 		}
-	}
-	return res.status(404).json({message:"not found"})
+		if(result.affectedRows === 0) {
+			return res.status(404).json({message:"not found"})
+		}
+		return res.status(200).json({message:"success"})
+	})
 })
 
 router.put("/shopping/:id",function(req,res) {
 	let tempId = parseInt(req.params.id,10);
-	let newItem = {
-		id:tempId,
-		type:req.body.type,
-		count:req.body.count,
-		price:req.body.price,
-		user:req.session.user
-	}
-	for(let i=0;i<database.length;i++) {
-		if(database[i].id === tempId) {
-			if(database[i].user === req.session.user) {
-				database.splice(i,1,newItem);
-				return res.status(200).json({message:"succees"})
-			} else {
-				return res.status(409).json({message:"conflict"})
-			}
+	let sql = "UPDATE shoppingitems SET type='"+req.body.type+"',count="+req.body.count+",price="+req.body.price+" WHERE _id="+tempId+" AND user='"+req.session.user+"'";
+	con.query(sql,  function(err,result) {
+		if(err) {
+			res.status(500).json({message:"database failure"})
+			throw err;			
 		}
-	}
-	return res.status(404).json({message:"not found"})
+		if(result.affectedRows === 0) {
+			return res.status(404).json({message:"not found"})
+		}
+		return res.status(200).json({message:"success"})
+	})
 })
 
 module.exports = router;
