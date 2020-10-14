@@ -20,10 +20,20 @@ let con = mysql.createConnection({
 
 con.connect(function(err) {
 	if(err) throw err;
-	let sql = "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50), password VARCHAR(256))"
+	let sql = "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, username VARCHAR(50) UNIQUE, password VARCHAR(256))"
 	con.query(sql,function(err,result) {
 		if(err) throw err;
 		console.log("Created table users if did not exist before:",result)
+	})
+	sql = "CREATE TABLE IF NOT EXISTS sessions (id INT AUTO_INCREMENT PRIMARY KEY, token VARCHAR(128), ttl BIGINT, user VARCHAR(50))"
+	con.query(sql,function(err,result) {
+		if(err) throw err;
+		console.log("Created table sessions if did not exist before:",result)
+	})
+	sql = "CREATE TABLE IF NOT EXISTS shoppingitems (_id INT AUTO_INCREMENT PRIMARY KEY, type VARCHAR(80), count INT, price FLOAT, user VARCHAR(50))"
+	con.query(sql,function(err,result) {
+		if(err) throw err;
+		console.log("Created table shoppingitems if did not exist before:",result)
 	})
 })
 
