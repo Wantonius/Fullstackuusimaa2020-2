@@ -103,7 +103,7 @@ const loginReducer = (state = initialState, action) => {
 				error:action.error,
 				loading:false
 			}
-			saveToStorage(tempState),
+			saveToStorage(tempState);
 			return tempState;
 		case CLEAR_LOGIN_STATE:
 			tempState = {

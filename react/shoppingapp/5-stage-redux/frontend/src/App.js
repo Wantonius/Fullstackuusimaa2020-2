@@ -40,27 +40,7 @@ class App extends React.Component {
 	}
 
 	//LOGIN API
-	register = (user) => {
-		let request = {
-			method:"POST",
-			mode:"cors",
-			headers:{"Content-type":"application/json"},
-			body:JSON.stringify(user)
-		}
-		fetch("/register",request).then(response =>{
-			if(response.ok) {
-				alert("Register success!")
-			} else {
-				if(response.status === 409) {
-					alert("Username is already in use!")
-				} else {
-					console.log("Server responded with status:",response.status);
-				}
-			}
-		}).catch(error => {
-			console.log("Server responded with error:",error);
-		})
-	}
+
 
 	login = (user) => {
 		let request = {
