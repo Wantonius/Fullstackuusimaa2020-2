@@ -63,7 +63,26 @@ export const login = (user) => {
 		})
 	}	
 }	
-	
+
+export const logout = (token) => {
+	return (dispatch) => { 
+		let request = {
+			method:"POST",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					"token":token}
+		}
+		fetch("/logout",request).then(response =>{
+			if(response.ok) {
+				dispatch(logoutSuccess());
+			} else {
+				dispatch(logoutFailed("Server responded with a status "+response.status+". Logging you out!"))
+			}
+		}).catch(error => {
+			dispatch(logoutFailed("Server responded with an error:"+error+" Logging you out!"));
+		})
+	}	
+}	
 //ACTION CREATORS
 
 export const loading = () => {

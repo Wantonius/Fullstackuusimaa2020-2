@@ -43,25 +43,7 @@ class App extends React.Component {
 
 
 	
-	logout = () => {
-		let request = {
-			method:"POST",
-			mode:"cors",
-			headers:{"Content-type":"application/json",
-					"token":this.props.token}
-		}
-		fetch("/logout",request).then(response =>{
-			this.setState({
-				isLogged:false,
-				token:"",
-				list:[]
-			}, () => {
-				this.saveToStorage();
-			})
-		}).catch(error => {
-			console.log("Server responded with error:",error);
-		})
-	}	
+
 	//REST API
 	
 	getList = () => {

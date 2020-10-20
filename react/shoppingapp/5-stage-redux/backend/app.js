@@ -147,9 +147,12 @@ app.post("/logout",function(req,res) {
 	if(!token) {
 		return res.status(404).json({message:"not found"})
 	}
-	sessionModel.deleteOne({token:token},function(err) {
+	sessionModel.deleteOne({token:token},function(err,session) {
 		if(err) {
 			console.log("Failed to remove session while logging out")
+		}
+		if(!session) {
+			return res.status(404).json({message:"not found"})
 		}
 		return res.status(200).json({message:"success"})
 	})
