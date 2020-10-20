@@ -10,70 +10,9 @@ import {connect} from 'react-redux';
 
 class App extends React.Component {
 	
-	constructor(props) {
-		super(props);
-		this.state = {
-			list:[]
-		}
-	}
-	
-	componentDidMount() {
-		if(sessionStorage.getItem("state")){
-			let state = JSON.parse(sessionStorage.getItem("state"));
-			this.setState(state,() => {this.getList()})
-		}
-	}
-
-	saveToStorage = () => {
-		sessionStorage.setItem("state",JSON.stringify(this.state));
-	}
-	
-	clearState = () => {
-		this.setState({
-			list:[],
-			isLogged:false,
-			token:""
-		}, () => {
-			this.saveToStorage();
-		})
-	}
-
-	//LOGIN API
-
-
-
-	
 
 	//REST API
-	
-	getList = () => {
-		let request = {
-			method:"GET",
-			mode:"cors",
-			headers:{"Content-type":"application/json",
-					 "token":this.props.token}
-		}
-		fetch("/api/shopping",request).then(response => {
-			if(response.ok) {
-				response.json().then(data => {
-					this.setState({
-						list:data
-					}, () => {
-						this.saveToStorage();
-					})
-				}).catch(error => {
-					console.log("Error parsing JSON:",error);
-				});
-			} else {
-				if(response.status === 403) {
-					this.clearState();
-				}
-				console.log("Server responded with status:",response.status);
-			}
-		}).catch(error => {
-			console.log("Server responded with an error:",error);
-		});
-	}
+
 	
 	addToList = (item) => {
 		let request = {
@@ -146,7 +85,7 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">
-				<Navbar isLogged={this.props.isLogged} logout={this.logout}/>
+				<Navbar />
 				<hr/>
 				<Switch>
 					<Route exact path="/" render={
@@ -157,8 +96,7 @@ class App extends React.Component {
 					}/>
 					<Route path="/list" render={
 						() => this.props.isLogged ? 
-						(<ShoppingList list={this.state.list} 
-									removeFromList={this.removeFromList} 
+						(<ShoppingList removeFromList={this.removeFromList} 
 									editItem={this.editItem}/>)
 						:
 						(<Redirect to="/"/>)
@@ -179,8 +117,8 @@ class App extends React.Component {
 const mapStateToProps = (state) => {
 	console.log(state);
 	return {
-		token:state.token,
-		isLogged:state.isLogged
+		token:state.login.token,
+		isLogged:state.login.isLogged
 	}
 }
 
