@@ -35,6 +35,35 @@ export const register = (user) => {
 	}
 }
 
+export const login = (user) => {
+	return (dispatch) => {	
+		let request = {
+			method:"POST",
+			mode:"cors",
+			headers:{"Content-type":"application/json"},
+			body:JSON.stringify(user)
+		}
+		dispatch(loading());
+		fetch("/login",request).then(response =>{
+			if(response.ok) {
+				response.json().then(data => {
+					dispatch(loginSuccess(data.token));
+				}).catch(error => {
+					dispatch(loginFailed("Error parsing login information:"+error));
+				})
+			} else {
+				if(response.status === 422 || response.status === 403) {
+					dispatch(loginFailed("Login failure. Username or password is incorrect."));
+				} else {
+					dispatch(loginFailed("Server responded with a conflict. Try again later:"+response.statusText));
+				}
+			}
+		}).catch(error => {
+			dispatch(loginFailed("Server responded with error:"+error));
+		})
+	}	
+}	
+	
 //ACTION CREATORS
 
 export const loading = () => {

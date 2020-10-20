@@ -110,7 +110,7 @@ app.post("/login",function(req,res) {
 	}
 	userModel.findOne({"username":req.body.username}, function(err,user) {
 		if(err) {
-			return res.status(422).json({message:"Please enter proper credentials"})
+			return res.status(409).json({message:"conflict"})
 		}
 		if(!user) {
 			return res.status(422).json({message:"Please enter proper credentials"})
@@ -118,7 +118,7 @@ app.post("/login",function(req,res) {
 		bcrypt.compare(req.body.password,user.password,function(err,success) {
 			if(err) {
 				console.log("Failed to compare passwords",err);
-				return res.status(403).json({message:"forbidden"});
+				return res.status(409).json({message:"conflict"});
 			}
 			if(!success) {
 				return res.status(403).json({message:"forbidden"});
@@ -133,7 +133,7 @@ app.post("/login",function(req,res) {
 			session.save(function(err) {
 				if(err) {
 					console.log("Session creation failed:",err)
-					return res.status(422).json({message:"Please enter proper credentials"})
+					return res.status(409).json({message:"conflict"})
 				}
 				return res.status(200).json({token:token})
 			})

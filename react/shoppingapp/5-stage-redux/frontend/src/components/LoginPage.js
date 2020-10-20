@@ -1,7 +1,7 @@
 import React from 'react';
 import {Form,Button} from 'semantic-ui-react';
 import {connect} from 'react-redux';
-import {register} from '../actions/loginActions';
+import {register,login} from '../actions/loginActions';
 
 class LoginPage extends React.Component {
 	
@@ -30,7 +30,7 @@ class LoginPage extends React.Component {
 			password:this.state.password
 		}
 		if(event.target.name === "login"){
-			this.props.login(user)
+			this.props.dispatch(login(user))
 		} else {
 			this.props.dispatch(register(user));
 		}

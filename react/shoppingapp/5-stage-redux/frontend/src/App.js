@@ -6,15 +6,14 @@ import ShoppingList from './components/ShoppingList';
 import {Switch,Route,Redirect} from 'react-router-dom';
 import Navbar from './components/Navbar';
 import LoginPage from './components/LoginPage';
+import {connect} from 'react-redux';
 
 class App extends React.Component {
 	
 	constructor(props) {
 		super(props);
 		this.state = {
-			list:[],
-			isLogged:false,
-			token:""
+			list:[]
 		}
 	}
 	
@@ -42,40 +41,14 @@ class App extends React.Component {
 	//LOGIN API
 
 
-	login = (user) => {
-		let request = {
-			method:"POST",
-			mode:"cors",
-			headers:{"Content-type":"application/json"},
-			body:JSON.stringify(user)
-		}
-		fetch("/login",request).then(response =>{
-			if(response.ok) {
-				response.json().then(data => {
-					this.setState({
-						isLogged:true,
-						token:data.token
-					}, () => {
-						this.saveToStorage();
-						this.getList();
-					})
-				}).catch(error => {
-					console.log("Error parsing JSON:",error);
-				})
-			} else {
-				console.log("Server responded with status:",response.status);
-			}
-		}).catch(error => {
-			console.log("Server responded with error:",error);
-		})
-	}	
+
 	
 	logout = () => {
 		let request = {
 			method:"POST",
 			mode:"cors",
 			headers:{"Content-type":"application/json",
-					"token":this.state.token}
+					"token":this.props.token}
 		}
 		fetch("/logout",request).then(response =>{
 			this.setState({
@@ -96,7 +69,7 @@ class App extends React.Component {
 			method:"GET",
 			mode:"cors",
 			headers:{"Content-type":"application/json",
-					 "token":this.state.token}
+					 "token":this.props.token}
 		}
 		fetch("/api/shopping",request).then(response => {
 			if(response.ok) {
@@ -125,7 +98,7 @@ class App extends React.Component {
 			method:"POST",
 			mode:"cors",
 			headers:{"Content-type":"application/json",
-					 "token":this.state.token},
+					 "token":this.props.token},
 			body:JSON.stringify(item)
 		}
 		fetch("/api/shopping",request).then(response => {
@@ -148,7 +121,7 @@ class App extends React.Component {
 			method:"DELETE",
 			mode:"cors",
 			headers:{"Content-type":"application/json",
-					 "token":this.state.token}
+					 "token":this.props.token}
 		}
 		fetch("/api/shopping/"+id,request).then(response => {
 			if(response.ok) {
@@ -170,7 +143,7 @@ class App extends React.Component {
 			method:"PUT",
 			mode:"cors",
 			headers:{"Content-type":"application/json",
-					 "token":this.state.token},
+					 "token":this.props.token},
 			body:JSON.stringify(newItem)
 		}
 		fetch("/api/shopping/"+newItem._id,request).then(response => {
@@ -191,18 +164,17 @@ class App extends React.Component {
 	render() {
 		return (
 			<div className="App">
-				<Navbar isLogged={this.state.isLogged} logout={this.logout}/>
+				<Navbar isLogged={this.props.isLogged} logout={this.logout}/>
 				<hr/>
 				<Switch>
 					<Route exact path="/" render={
-						() => this.state.isLogged ?
+						() => this.props.isLogged ?
 						(<Redirect to="/list"/>) 
 						:
-						(<LoginPage register={this.register}
-						login={this.login}/>)
+						(<LoginPage />)
 					}/>
 					<Route path="/list" render={
-						() => this.state.isLogged ? 
+						() => this.props.isLogged ? 
 						(<ShoppingList list={this.state.list} 
 									removeFromList={this.removeFromList} 
 									editItem={this.editItem}/>)
@@ -210,7 +182,7 @@ class App extends React.Component {
 						(<Redirect to="/"/>)
 					}/>
 					<Route path="/form" render={
-						() => this.state.isLogged ? 
+						() => this.props.isLogged ? 
 						(<ShoppingForm 
 							addToList={this.addToList}/>)
 						:
@@ -222,4 +194,12 @@ class App extends React.Component {
 	}
 }
 
-export default App;
+const mapStateToProps = (state) => {
+	console.log(state);
+	return {
+		token:state.token,
+		isLogged:state.isLogged
+	}
+}
+
+export default connect(mapStateToProps)(App);
