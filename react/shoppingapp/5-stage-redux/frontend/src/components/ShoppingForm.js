@@ -1,7 +1,9 @@
 import React from 'react';
 import {Form,Button} from 'semantic-ui-react';
+import {connect} from 'react-redux';
+import {addToList} from '../actions/shoppingActions';
 
-export default class ShoppingForm extends React.Component {
+class ShoppingForm extends React.Component {
 	
 	constructor(props) {
 		super(props);
@@ -26,7 +28,7 @@ export default class ShoppingForm extends React.Component {
 			count:this.state.count,
 			price:this.state.price
 		}
-		this.props.addToList(item);
+		this.props.dispatch(addToList(item,this.props.token));
 		this.setState({
 			type:"",
 			count:0,
@@ -64,3 +66,11 @@ export default class ShoppingForm extends React.Component {
 		)
 	}
 }
+
+const mapStateToProps = (state) => {
+	return {
+		token:state.login.token
+	}
+}
+
+export default connect(mapStateToProps)(ShoppingForm);

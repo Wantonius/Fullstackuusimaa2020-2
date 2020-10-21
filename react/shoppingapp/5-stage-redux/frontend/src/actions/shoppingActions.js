@@ -42,6 +42,98 @@ export const getList = (token) => {
 		});
 	}
 }
+
+export const addToList = (item,token) => {
+	return (dispatch) => {
+		let request = {
+			method:"POST",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					 "token":token},
+			body:JSON.stringify(item)
+		}
+		dispatch(loading());
+		fetch("/api/shopping",request).then(response => {
+			if(response.ok) {
+				dispatch(addToShoppinglistSuccess());
+				dispatch(getList(token));
+			}
+		    else {
+				dispatch(loadingDone());
+				if(response.status === 403) {
+					dispatch(addToShoppinglistFailed("Server responded with an expired session. Logging you out!"))
+					dispatch(clearLoginState());
+				} else {
+					dispatch(addToShoppinglistFailed("Server responded with status:"+response.statusText));
+				}
+			}
+		}).catch(error => {
+			dispatch(loadingDone());
+			dispatch(addToShoppinglistFailed("Server responded with an error:"+error));
+		});
+	}
+}
+
+export const removeFromList = (id,token) => {
+	return (dispatch) => {
+		let request = {
+			method:"DELETE",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					 "token":token}
+		}
+		dispatch(loading());
+		fetch("/api/shopping/"+id,request).then(response => {
+			if(response.ok) {
+				dispatch(removeFromShoppinglistSuccess());
+				dispatch(getList(token));
+			}
+		    else {
+				dispatch(loadingDone());
+				if(response.status === 403) {
+					dispatch(removeFromShoppinglistFailed("Server responded with an expired session. Logging you out!"));
+					dispatch(clearLoginState());
+				} else {
+					dispatch(removeFromShoppinglistFailed("Server responded with status:"+response.statusText));
+				}
+			}
+		}).catch(error => {
+			dispatch(loadingDone());
+			dispatch(removeFromShoppinglistFailed("Server responded with an error:"+error));
+		});
+	}
+}	
+
+export const editItem = (newItem,token) => {
+	return (dispatch) => {	
+		let request = {
+			method:"PUT",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					 "token":token},
+			body:JSON.stringify(newItem)
+		}
+		dispatch(loading());
+		fetch("/api/shopping/"+newItem._id,request).then(response => {
+			if(response.ok) {
+				dispatch(editItemSuccess());
+				dispatch(getList(token));
+			} else {
+				dispatch(loadingDone());
+				if(response.status === 403) {
+					dispatch(editItemFailed("Server responded with an expired session. Logging you out!"));
+					dispatch(clearLoginState());
+				} else {
+					dispatch(editItemFailed("Server responded with status:"+response.statusText));
+				}
+			}
+		}).catch(error => {
+			dispatch(loadingDone());
+			dispatch(editItemFailed("Server responded with an error:"+error));
+		});
+	}
+}
+
 //ACTION CREATORS
 
 export const fetchShoppinglistSuccess = (list) => {

@@ -40,6 +40,7 @@ const saveToStorage = (state) => {
 const initialState = getInitialState();
 
 const loginReducer = (state = initialState, action) => {
+	console.log("LoginReducer:",action);
 	let tempState = {}
 	switch(action.type) {
 		case LOADING: 
