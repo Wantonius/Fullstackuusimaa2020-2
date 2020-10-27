@@ -6,27 +6,69 @@ export default class StateProvider extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			list:[],
-			id:100
+			list:[]
 		}
 	}
 	
-	addToList = (contact) => {
-		contact.id = this.state.id;
-		let tempList = this.state.list.concat(contact);
-		this.setState(state =>{ 
-		return {
-			id:state.id+1,
-			list:tempList
+	componentDidMount() {
+		this.getContacts();
+	}
+	
+	getContacts = () => {
+		let request = {
+			method:"GET",
+			mode:"cors",
+			headers:{"Content-type":"application/json"}
 		}
+		fetch("/api/contact",request).then(response => {
+			if(response.ok) {
+				response.json().then(data => {
+					this.setState({
+						list:data
+					})
+				}).catch(error => {
+					console.log("Cannot parse JSON, error:"+error);
+				});
+			} else {
+				console.log("Server responded with status:"+response.status);
+			}
+		}).catch(error => {
+			console.log("Server responded with an error:"+error);
+		})
+	}
+	
+	addToList = (contact) => {
+		let request = {
+			method:"POST",
+			mode:"cors",
+			headers:{"Content-type":"application/json"},
+			body:JSON.stringify(contact)
+		}
+		fetch("/api/contact",request).then(response => {
+			if(response.ok) {
+				this.getContacts();
+			} else {
+				console.log("Server responded with a status:"+response.status);
+			}
+		}).catch(error => {
+			console.log("Server responded with an error:"+error)
 		})
 	}
 	
 	removeFromList = (id) => {
-		let tempId = parseInt(id,10);
-		let tempList = this.state.list.filter(contact => contact.id !== tempId);
-		this.setState({
-			list:tempList
+		let request = {
+			method:"DELETE",
+			mode:"cors",
+			headers:{"Content-type":"application/json"}
+		}
+		fetch("/api/contact/"+id,request).then(response => {
+			if(response.ok) {
+				this.getContacts();
+			} else {
+				console.log("Server responded with a status:"+response.status);
+			}
+		}).catch(error => {
+			console.log("Server responded with an error:"+error);
 		})
 	}
 
