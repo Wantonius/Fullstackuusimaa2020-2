@@ -1,6 +1,7 @@
 import React from 'react';
 import {Form,Button} from 'semantic-ui-react';
 import {withRouter} from 'react-router-dom';
+import StateManager from '../statemanager/StateManager';
 
 class ContactForm extends React.Component {
 
@@ -32,7 +33,7 @@ class ContactForm extends React.Component {
 			city:this.state.city,
 			phone:this.state.phone
 		}
-		console.log(contact);
+		this.props.addToList(contact);
 		this.props.history.push("/");
 	}
 	
@@ -87,4 +88,4 @@ class ContactForm extends React.Component {
 	}
 }
 
-export default withRouter(ContactForm);
+export default withRouter(StateManager(ContactForm));

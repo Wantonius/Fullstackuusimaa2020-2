@@ -1,14 +1,11 @@
 import React from 'react';
 import {Table,Button} from 'semantic-ui-react';
+import StateManager from '../statemanager/StateManager';
 
 class ContactList extends React.Component {
 
 	render() {
-		let list = [];
-		if(this.props.list) {
-			list = this.props.list
-		}
-		let contacts = list.map(contact => {
+		let contacts = this.props.list.map(contact => {
 			return (
 				<Table.Row key={contact.id}>
 					<Table.Cell>{contact.firstname}</Table.Cell>
@@ -17,6 +14,7 @@ class ContactList extends React.Component {
 					<Table.Cell>{contact.address}</Table.Cell>
 					<Table.Cell>{contact.city}</Table.Cell>
 					<Table.Cell>{contact.phone}</Table.Cell>
+					<Table.Cell><Button onClick={() => this.props.removeFromList(contact.id)}>Remove</Button></Table.Cell>
 				</Table.Row>
 			)
 		})
@@ -29,6 +27,7 @@ class ContactList extends React.Component {
 					<Table.HeaderCell>Address</Table.HeaderCell>
 					<Table.HeaderCell>City</Table.HeaderCell>
 					<Table.HeaderCell>Phone</Table.HeaderCell>
+					<Table.HeaderCell>Remove</Table.HeaderCell>
 				</Table.Header>
 				<Table.Body>
 				{contacts}
@@ -38,4 +37,4 @@ class ContactList extends React.Component {
 	}
 }
 
-export default ContactList;
+export default StateManager(ContactList);
