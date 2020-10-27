@@ -1,5 +1,6 @@
 import React from 'react';
 import {Form,Button} from 'semantic-ui-react';
+import {withRouter} from 'react-router-dom';
 
 class ContactForm extends React.Component {
 
@@ -32,6 +33,7 @@ class ContactForm extends React.Component {
 			phone:this.state.phone
 		}
 		console.log(contact);
+		this.props.history.push("/");
 	}
 	
 	render() {
@@ -85,4 +87,4 @@ class ContactForm extends React.Component {
 	}
 }
 
-export default ContactForm;
+export default withRouter(ContactForm);
