@@ -35,7 +35,7 @@ export default class HocLoggerProvider extends React.Component {
 		if(this.state.url) {
 			url = this.state.url+"/hoclog"
 		}
-		fetch(request,url).then(response => {
+		fetch(url,request).then(response => {
 			if(!response.ok) {
 				console.log("Failed to log. Response:",response.status);
 			}

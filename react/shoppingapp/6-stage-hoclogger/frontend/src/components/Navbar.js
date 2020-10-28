@@ -3,8 +3,11 @@ import {Link} from 'react-router-dom';
 import {List,Header} from 'semantic-ui-react';
 import {connect} from 'react-redux';
 import {logout} from '../actions/loginActions';
+import HocLogger from '../hoclogger/HocLogger';
 
 class Navbar extends React.Component {
+	
+
 
 	render() {
 		let header = <Header>Shopping App</Header>;
@@ -12,8 +15,10 @@ class Navbar extends React.Component {
 			header = <Header>Loading...</Header>;
 		}
 		if(this.props.error) {
+			//this.props.hoclog(this.props.loglevel.LOG_ERROR, "Error handler", this.props.error);
+
 			header = <Header>{this.props.error}</Header>;
-		}
+		} 
 		if(this.props.isLogged) {
 			return (
 			<div style={{"backgroundColor":"lightblue","height":100}}>
@@ -51,4 +56,4 @@ const mapStateToProps = (state) => {
 	}
 }
 
-export default connect(mapStateToProps)(Navbar);
+export default HocLogger(connect(mapStateToProps)(Navbar));
