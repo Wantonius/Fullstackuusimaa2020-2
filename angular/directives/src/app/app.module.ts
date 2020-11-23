@@ -1,13 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
+import { Conditional } from './conditional.component';
 
 import { AppComponent } from './app.component';
-import { HelloWorld } from './helloworld.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-	HelloWorld
+	Conditional
   ],
   imports: [
     BrowserModule
