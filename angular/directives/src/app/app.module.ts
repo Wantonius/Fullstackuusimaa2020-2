@@ -1,13 +1,15 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { Conditional } from './conditional.component';
+import { PersonList} from './personlist.component';
 
 import { AppComponent } from './app.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-	Conditional
+	Conditional,
+	PersonList
   ],
   imports: [
     BrowserModule
