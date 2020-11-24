@@ -1,0 +1,11 @@
+<h2>Start Screen</h2>
+<p>Guess a number between 1-100. Player with least amount of guesses is the best. Good Luck!</p>
+<form (ngSubmit)="startGame()" #gameform="ngForm">
+	<label for="playername">Player name:</label>
+	<input type="text"	
+			id="playername"
+			name="playername"
+			[(ngModel)]="playerName"/>
+	<br/>
+	<input type="submit" value="Start"/>
+</form>
