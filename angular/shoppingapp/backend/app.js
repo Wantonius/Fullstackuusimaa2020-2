@@ -48,7 +48,7 @@ createToken = () => {
 
 //LOGIN API
 
-app.post("/register",function(req,res) {
+app.post("/a/register",function(req,res) {
 	if(!req.body) {
 		return res.status(422).json({message:"Please enter proper credentials"})
 	}
@@ -71,7 +71,7 @@ app.post("/register",function(req,res) {
 	return res.status(200).json({message:"success"})
 })
 
-app.post("/login",function(req,res) {
+app.post("/a/login",function(req,res) {
 	if(!req.body) {
 		return res.status(422).json({message:"Please enter proper credentials"})
 	}
@@ -92,7 +92,7 @@ app.post("/login",function(req,res) {
 					token:token
 				}
 				loggedSessions.push(session);
-				return res.status(200).json({token:token})
+				return res.status(200).json({token:token,message:"Success"})
 				
 			}
 		}
@@ -100,10 +100,10 @@ app.post("/login",function(req,res) {
 	return res.status(403).json({message:"forbidden"})
 })
 
-app.use("/api",isUserLogged,apiroutes);
+app.use("/a/api",isUserLogged,apiroutes);
 
 
-let port = process.env.PORT || 3001
+let port = process.env.PORT || 3000
 
 app.listen(port);
 
