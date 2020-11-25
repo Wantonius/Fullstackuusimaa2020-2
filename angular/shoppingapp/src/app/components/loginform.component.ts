@@ -14,10 +14,11 @@ export class LoginForm implements OnInit {
 	
 	constructor(private _login:LoginService, private _router:Router) {}
 	
-	// TODO: ngOnInit check login status -> route to shoppinglist
 
 	ngOnInit() {
-		
+		if(this._login.isUserLogged()) {
+			this._router.navigate(['/list']);
+		}
 	}
 
 	login() {
@@ -29,7 +30,7 @@ export class LoginForm implements OnInit {
 			data => {
 				this.message = data.message;
 				this._login.setLoginState(true,data.token);
-				//TODO: route to shoppinglist 
+				this._router.navigate(['/list']);
 			},
 			error => this.message = error.message,
 			() => console.log("Login complete")		
