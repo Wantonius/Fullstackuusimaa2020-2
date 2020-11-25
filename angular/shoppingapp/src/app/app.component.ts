@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import {LoginService} from './services/loginservice.service';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,27 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  title = 'shoppingapp';
+  
+  constructor(private _login:LoginService,private _router:Router) {}
+  
+  isUserLogged() {
+	  return this._login.isUserLogged()
+  }
+  
+  logout() {
+	  this._login.logout().subscribe(
+		data => console.log(data.message),
+		error => {
+			console.log(error.message);
+			this._login.setLoginState(false,"");
+			this._router.navigate(['/'])
+		},
+		() => {
+			this._login.setLoginState(false,"");
+			this._router.navigate(['/'])		
+		}
+		
+	  )
+  }
+  
 }

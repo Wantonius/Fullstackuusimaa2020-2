@@ -100,6 +100,17 @@ app.post("/a/login",function(req,res) {
 	return res.status(403).json({message:"forbidden"})
 })
 
+app.post("/a/logout",function(req,res) {
+	let token = req.headers.token;
+	for(let i=0; i<loggedSessions.length;i++) {
+		if(token === loggedSessions[i].token) {
+			loggedSessions.splice(i,1);
+			return res.status(200).json({message:"Logout success"})
+		}
+	}
+	return res.status(404).json({message:"Session not found. Logging out!"})
+})
+
 app.use("/a/api",isUserLogged,apiroutes);
 
 

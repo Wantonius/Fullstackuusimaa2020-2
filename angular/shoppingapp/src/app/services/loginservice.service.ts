@@ -41,6 +41,16 @@ export class LoginService {
 		return this._http.post<BackendMessage>("/a/login",user,httpOptions);
 	}	
 	
+	logout() {
+		const httpOptions = {
+			headers:new HttpHeaders({
+				"Content-type":"application/json",
+				"token":this.token
+			})
+		}
+		return this._http.post<BackendMessage>("/a/logout",{},httpOptions);
+	}
+	
 	setLoginState(login:boolean,token:string) {
 		this.isLogged = login;
 		this.token = token;
