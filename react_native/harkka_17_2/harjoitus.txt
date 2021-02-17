@@ -1,0 +1,33 @@
+Numberguess-game
+
+Tehdään numeronarvauspeli React Nativella ja Stack Navigatorilla.
+Tarvitaan App, StartPage sekä GamePage. App säilyttää pelin tilan
+(kohdenumeron, arvausten määrän, pelaajan nimen, pelin tilan  etc). 
+
+StartPagella asetetaan nimi ja samalla kun nimi asetetaan, peli arpoo kohdenumeron 1-100 välillä. Peli asetetaan tilaan "playing", jolloin
+StartPage ei enää toimi. Siirryttäessä GamePagelle pelaaja voi arvata
+numeroa 1-100 väliltä ja peli kertoo oliko arvaus liian suuri vai liian
+pieni. GamePage ei toimi, jos peli on tilassa "init". Tämän voi joko estää
+Stack Navigatorissa tai itse funktioissa. Kun pelaaja arvaa luvun oikein, juhlitaan ja peli resetoi alkutilaan ("init", arvausten määrä 0,
+kohdenumero 0, pelaajan nimi tyhjä etc)
+
+Stack Navigator:
+https://reactnavigation.org/docs/getting-started
+https://reactnavigation.org/docs/hello-react-navigation/
+
+Navigating between screens:
+https://reactnavigation.org/docs/navigating
+
+Erityisesti! Jos haluaa kerrata Contextia, niin nyt on mahtava
+mahdollisuus. Muuten voi käyttää tuota render props callbackia.
+
+Passing props to screens:
+Sometimes we might want to pass additional props to a screen. We can do that with 2 approaches:
+
+    Use React context and wrap the navigator with a context provider to pass data to the screens (recommended).
+
+    Use a render callback for the screen instead of specifying a component prop:
+
+	<Stack.Screen name="Home">
+	  {props => <HomeScreen {...props} extraData={someData} />}
+	</Stack.Screen>
