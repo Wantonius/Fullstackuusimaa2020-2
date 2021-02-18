@@ -1,0 +1,3 @@
+Tee perusversio Shopping Appsistä mukana React Navigation. Seuraile
+colorapps esimerkkiä.
+
