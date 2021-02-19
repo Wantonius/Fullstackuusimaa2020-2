@@ -3,6 +3,11 @@ import StateManager from './context/StateManager';
 import {FlatList,View,Pressable,Text,StyleSheet} from 'react-native'
 
 class ShoppingList extends React.Component {
+	
+	changeToEditMode = (item) => {
+		this.props.changeToEditMode(item);
+		this.props.navigation.navigate("Add Item");
+	}
 
 	render() {
 		const styles = StyleSheet.create({
@@ -14,7 +19,8 @@ class ShoppingList extends React.Component {
 				height:50,
 				backgroundColor:"#225522",
 				justifyContent:"center",
-				alignItems:"center"
+				alignItems:"center",
+				marginRight:15
 			},
 			editButton:{
 				width:80,
@@ -26,7 +32,9 @@ class ShoppingList extends React.Component {
 			textStyle:{
 				fontSize:18,
 				fontFamily:"sans-serif",
-				fontWeight:"bold"
+				fontWeight:"bold",
+				paddingLeft:10,
+				paddingRight:10
 			}
 		})
 	return(
@@ -36,8 +44,11 @@ class ShoppingList extends React.Component {
 							style={styles.removeButton}>
 					<Text style={styles.textStyle}>Logout</Text>
 				</Pressable>
-				<Pressable onPress={() => this.props.navigation.navigate("Add Item")} 
-							style={styles.editButton}>
+				<Pressable onPress={() => {
+					this.props.navigation.navigate("Add Item") 
+					this.props.cancel();
+					}}
+					style={styles.editButton}>
 					<Text style={styles.textStyle}>Add Item</Text>
 				</Pressable>			
 			</View>
@@ -45,7 +56,7 @@ class ShoppingList extends React.Component {
 					renderItem={
 						({item,index}) => {
 							return(
-								<View style={style.rowStyle}>
+								<View style={styles.rowStyle}>
 									<Text style={styles.textStyle}>
 										{item.count}
 									</Text>
@@ -59,13 +70,14 @@ class ShoppingList extends React.Component {
 									style={styles.removeButton}>
 										<Text style={styles.textStyle}>Remove</Text>
 									</Pressable>
-									<Pressable style={styles.editButton}>
+									<Pressable onPress={() => this.changeToEditMode(item)} style={styles.editButton}>
 										<Text style={styles.textStyle}>Edit</Text>
 									</Pressable>	
 								</View>
 							)
 						}
-					}/>
+					}
+					keyExtractor={item => ""+item.id}/>
 		</View>
 	)
 	}

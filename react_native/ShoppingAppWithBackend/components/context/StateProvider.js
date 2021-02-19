@@ -1,5 +1,6 @@
 import React from 'react';
 import StateContext from './StateContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default class StateProvider extends React.Component {
 
@@ -10,11 +11,34 @@ export default class StateProvider extends React.Component {
 			token:"",
 			error:"",
 			loading:false,
-			list:[]
+			list:[],
+			mode:"Add",
+			item:{}
+		}
+	}
+
+	loadStorage = async () => {
+		try {
+			let value = await AsyncStorage.getItem('@state');
+			if(value !== null) {
+				let state = JSON.parse(value)
+				this.setState(state);
+			}
+		} catch (e) {
+			console.log("Failed to load storage");
 		}
 	}
 	
+	saveStorage = async () => {
+		try {
+			await AsyncStorage.setItem('@state',JSON.stringify(this.state));
+		} catch (e) {
+			console.log("Failed to save storage");
+		}		
+	}
+	
 	componentDidMount() {
+		this.loadStorage();
 		if(this.state.isLogged) {
 			this.getShoppingList();
 		}
@@ -51,7 +75,8 @@ export default class StateProvider extends React.Component {
 						token:data.token,
 						isLogged:true
 					},() => {
-						this.getShoppingList()
+						this.getShoppingList();
+						this.saveStorage();
 					})
 				}).catch(error => {
 					this.setError("Failed to parse server response. Try again!");
@@ -100,6 +125,8 @@ export default class StateProvider extends React.Component {
 				loading:false,
 				isLogged:false,
 				token:""
+			}, () => {
+				this.saveStorage();
 			})
 		}).catch(error => {
 			this.setError(error);
@@ -121,6 +148,8 @@ export default class StateProvider extends React.Component {
 						error:"",
 						loading:false,
 						list:data
+					}, () => {
+						this.saveStorage();
 					})
 				}).catch(error => {
 					this.setError("Failed to parse server response. Try again!");
@@ -135,15 +164,79 @@ export default class StateProvider extends React.Component {
 	}
 	
 	addToList = (item) => {
-		
+		if(item.id) {
+			let request = {
+				method:"PUT",
+				mode:"cors",
+				headers:{"Content-type":"application/json",
+						"token":this.state.token},
+				body:JSON.stringify(item)
+			}
+			this.setLoading(true);
+			fetch("http://uusimaa-backend.herokuapp.com/api/shopping/"+item.id,request).then(response => {
+				if(response.ok) {
+					this.getShoppingList();
+				} else {
+					let error = "Failed to edit item. Server responded with a status:"+response.status
+					this.setError(error);
+				}
+			}).catch(error => {
+				this.setError(error);
+			})			
+		} else {
+			let request = {
+				method:"POST",
+				mode:"cors",
+				headers:{"Content-type":"application/json",
+						"token":this.state.token},
+				body:JSON.stringify(item)
+			}
+			this.setLoading(true);
+			fetch("http://uusimaa-backend.herokuapp.com/api/shopping",request).then(response => {
+				if(response.ok) {
+					this.getShoppingList();
+				} else {
+					let error = "Failed to add new item. Server responded with a status:"+response.status
+					this.setError(error);
+				}
+			}).catch(error => {
+				this.setError(error);
+			})
+		}		
 	}
 	
 	removeFromList = (id) => {
-		
+		let request = {
+			method:"DELETE",
+			mode:"cors",
+			headers:{"Content-type":"application/json",
+					"token":this.state.token}
+		}
+		this.setLoading(true);
+		fetch("http://uusimaa-backend.herokuapp.com/api/shopping/"+id,request).then(response => {
+			if(response.ok) {
+				this.getShoppingList();
+			} else {
+				let error = "Failed to delete item. Server responded with a status:"+response.status
+				this.setError(error);
+			}
+		}).catch(error => {
+			this.setError(error);
+		})		
 	}
 	
-	editItem = (item) => {
-		
+	changeToEditMode = (item) => {
+		this.setState({
+			mode:"Edit",
+			item:item
+		})
+	}
+	
+	cancel = () => {
+		this.setState({
+			mode:"Add",
+			item:{}
+		})
 	}
 	
 	render() {
@@ -154,12 +247,16 @@ export default class StateProvider extends React.Component {
 				error:this.state.error,
 				loading:this.state.loading,
 				list:this.state.list,
+				mode:this.state.mode,
+				item:this.state.item,
 				addToList:this.addToList,
 				removeFromList:this.removeFromList,
 				editItem:this.editItem,
 				login:this.login,
 				register:this.register,
-				logout:this.logout
+				logout:this.logout,
+				changeToEditMode:this.changeToEditMode,
+				cancel:this.cancel
 			}}>
 			{this.props.children}
 			</StateContext.Provider>
